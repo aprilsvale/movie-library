@@ -3,5 +3,5 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ message }: EmptyStateProps) {
-    return <div className="empty-state">{message ?? "Ничего не найдено"}</div>;
+    return <div className="empty-state">{message ?? "Nothing was found"}</div>;
 }

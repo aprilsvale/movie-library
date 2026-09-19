@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { getMovieById } from "../api/movies";
 import type { Movie } from "../api/types";
 import { FavouriteButton } from "../components/FavouriteButton";
+import { ErrorState } from "../components/ErrorState";
+import { Loader } from "../components/Loader";
 
 export function MoviePage() {
     const { id } = useParams<{ id: string }>();
@@ -25,7 +27,7 @@ export function MoviePage() {
             })
             .catch((err) => {
                 if (cancelled) return;
-                setError(err instanceof Error ? err.message : "Что-то пошло не так");
+                setError(err instanceof Error ? err.message : "Something went wrong");
             })
             .finally(() => {
                 if (!cancelled) setLoading(false);
@@ -36,8 +38,8 @@ export function MoviePage() {
         };
     }, [id]);
 
-    if (loading) return <p>Загрузка...</p>;
-    if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
+    if (loading) return <Loader />;
+    if (error) return <ErrorState message={error} />;
     if (!movie) return null;
 
     const poster = movie.poster?.url ?? movie.poster?.previewUrl;
@@ -46,13 +48,13 @@ export function MoviePage() {
 
     return (
         <div className="movie-page">
-            <h1>{movie.name ?? "Без названия"}</h1>
+            <h1>{movie.name ?? "No name"}</h1>
 
             <div className="movie-page__content">
                 {poster && (
                     <img
                         src={poster}
-                        alt={movie.name ?? "Постер"}
+                        alt={movie.name ?? "Poster"}
                         className="movie-page__poster"
                     />
                 )}
@@ -62,7 +64,7 @@ export function MoviePage() {
                     <p><b>Рейтинг:</b> {rating}</p>
                     <p><b>Жанры:</b> {genres}</p>
                     <p className="movie-page__description">
-                        {movie.description ?? movie.shortDescription ?? "Описание отсутствует"}
+                        {movie.description ?? movie.shortDescription ?? "Lacks description"}
                     </p>
                     <FavouriteButton movie={movie} />
                 </div>

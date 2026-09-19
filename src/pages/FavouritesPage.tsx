@@ -9,7 +9,7 @@ export function FavouritesPage() {
 
     return (
         <div className="favourites-page">
-            <h1>Избранное</h1>
+            <h1>Favs</h1>
                 {Favs.length === 0 ? (
                 <EmptyState/>
             ) : (

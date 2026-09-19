@@ -3,6 +3,9 @@ import type { Movie } from "../api/types";
 import {searchMovies} from "../api/movies";
 import {useDebounce} from "../hooks/useDebounce";
 import {MovieList} from "../components/MovieList";
+import {EmptyState} from "../components/EmptyState";
+import {ErrorState} from "../components/ErrorState";
+
 
 
 
@@ -39,7 +42,7 @@ export function HomePage() {
             })
             .catch((err) => {
                 if (cancelled) return;
-                setError(err instanceof Error ? err.message : "Что-то пошло не так");
+                setError(err instanceof Error ? err.message : "Something went wrong");
                 setMovies([]);
                 setHasSearched(true);
             })
@@ -57,17 +60,15 @@ export function HomePage() {
             <h1>Search</h1>
 
             <input
+                className="search-input"
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search..."
             />
-            <p>Сырое: {query}</p>
-            <p>Отложенное: {debouncedQuery}</p>
-            {loading && <p>Loading...</p>}
-            {error && <p> Error </p> }
+            {error && <ErrorState message={error} />}
             {!loading && !error && hasSearched && movies.length === 0 && (
-                <p> Nothing is here </p>
+                <EmptyState message={`Nothing was found upon this request «${debouncedQuery}»`} />
             )}
             {movies.length > 0 && <MovieList movies={movies} />}
         </div>

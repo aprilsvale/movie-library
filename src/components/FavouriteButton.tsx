@@ -25,9 +25,9 @@ export function FavouriteButton({ movie, className }: FavouriteButtonProps) {
             className={`favorite-btn ${isFavourite ? "favorite-btn--active" : ""} ${
                 className ?? ""
             }`}
-            aria-label={isFavourite ? "Убрать из избранного" : "Добавить в избранное"}
+            aria-label={isFavourite ? "Remove from favs" : "Add to favs"}
         >
-            {isFavourite ? "★ В избранном" : "☆ В избранное"}
+            {isFavourite ? "★ In favs" : "☆ To favs"}
         </button>
     );
 }

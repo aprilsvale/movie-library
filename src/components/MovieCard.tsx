@@ -14,17 +14,17 @@ export function MovieCard({ movie }: MovieCardProps) {
             {poster ? (
                 <img
                     src={poster}
-                    alt={movie.name ?? "Постер"}
+                    alt={movie.name ?? "Poster"}
                     className="movie-card__poster"
                 />
             ) : (
                 <div className="movie-card__poster movie-card__poster--empty">
-                    Нет постера
+                    No poster
                 </div>
             )}
 
             <div className="movie-card__info">
-                <h3 className="movie-card__title">{movie.name ?? "Без названия"}</h3>
+                <h3 className="movie-card__title">{movie.name ?? "No name"}</h3>
                 <span className="movie-card__year">{movie.year ?? "—"}</span>
                 <FavouriteButton movie={movie} className="movie-card__fav" />
             </div>
