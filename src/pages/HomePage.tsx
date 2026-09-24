@@ -31,8 +31,8 @@ export function HomePage() {
             setMovies(data.docs);
             setHasSearched(true);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Something went wrong");
             if (currentId !== requestIdRef.current) return;
+            setError(err instanceof Error ? err.message : "Something went wrong");
             setMovies([]);
             setHasSearched(true);
         } finally {
@@ -41,6 +41,7 @@ export function HomePage() {
             }
 
         }
+    };
 
     useEffect(() => {
         const trimmed = debouncedQuery;
