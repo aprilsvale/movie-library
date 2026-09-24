@@ -1,6 +1,11 @@
 const BASE_URL = "/api/v1.4";
 const API_KEY = import.meta.env.VITE_KINOPOISK_API_KEY;
 
+interface ApiError {
+    message?: string | string[];
+}
+
+
 export async function apiGet<T>(
     path: string,
     params: Record<string, string | number> = {}
@@ -19,7 +24,13 @@ export async function apiGet<T>(
     });
 
     if (!response.ok) {
-        throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
+        const body: ApiError | null = await response.json().catch(() => null);
+
+        const message = Array.isArray(body?.message)
+            ? body.message.join(". ")
+            : body?.message;
+
+        throw new Error(message ?? `Не удалось загрузить данные (${response.status})`);
     }
 
     return (await response.json()) as T;

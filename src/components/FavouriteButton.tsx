@@ -1,4 +1,5 @@
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../app/store";
 import { toggleFavourite } from "../features/favourites/favouritesSlice";
 import type { Movie } from "../api/types";
 
@@ -7,13 +8,12 @@ interface FavouriteButtonProps {
     className?: string;
 }
 export function FavouriteButton({ movie, className }: FavouriteButtonProps) {
-    const dispatch = useAppDispatch();
-    const isFavourite = useAppSelector((state) =>
+    const dispatch = useDispatch<AppDispatch>();
+    const isFavourite = useSelector((state: RootState) =>
         state.favourites.items.some((item) => item.id === movie.id)
     );
 
     const handleClick = (e: React.MouseEvent) => {
-        e.preventDefault();
         e.stopPropagation();
         dispatch(toggleFavourite(movie));
     };

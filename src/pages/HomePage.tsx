@@ -1,13 +1,11 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import type { Movie } from "../api/types";
 import {searchMovies} from "../api/movies";
 import {useDebounce} from "../hooks/useDebounce";
 import {MovieList} from "../components/MovieList";
 import {EmptyState} from "../components/EmptyState";
 import {ErrorState} from "../components/ErrorState";
-
-
-
+import {Loader} from "../components/Loader";
 
 export function HomePage() {
     const [query, setQuery] = useState("");
@@ -16,43 +14,41 @@ export function HomePage() {
     const [error, setError] = useState<string | null>(null);
     const [hasSearched, setHasSearched] = useState(false);
 
-    const debouncedQuery = useDebounce(query, 400)
+    const debouncedQuery = useDebounce(query.trim(), 400)
 
-    useEffect(() => {
-        const trimmed = debouncedQuery.trim();
+    const requestIdRef = useRef(0)
 
-        if (!trimmed) {
-            setMovies([]);
-            setError(null);
-            setLoading(false);
-            setHasSearched(false);
-            return;
-        }
+    const loadMovies = async(searchQuery: string) => {
 
-        let cancelled = false;
+        const currentId = ++requestIdRef.current;
 
         setLoading(true);
         setError(null);
 
-        searchMovies(trimmed)
-            .then((data) => {
-                if (cancelled) return;
-                setMovies(data.docs);
-                setHasSearched(true);
-            })
-            .catch((err) => {
-                if (cancelled) return;
-                setError(err instanceof Error ? err.message : "Something went wrong");
-                setMovies([]);
-                setHasSearched(true);
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
+        try {
+            const data = await searchMovies(searchQuery)
+            if (currentId !== requestIdRef.current) return;
+            setMovies(data.docs);
+            setHasSearched(true);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Something went wrong");
+            if (currentId !== requestIdRef.current) return;
+            setMovies([]);
+            setHasSearched(true);
+        } finally {
+            if (currentId === requestIdRef.current) {
+                setLoading(false);
+            }
 
-        return () => {
-            cancelled = true;
-        };
+        }
+
+    useEffect(() => {
+        const trimmed = debouncedQuery;
+
+        if (trimmed.length < 3) {
+            return;
+        }
+        loadMovies(trimmed);
     }, [debouncedQuery]);
 
     return(
@@ -60,17 +56,26 @@ export function HomePage() {
             <h1>Search</h1>
 
             <input
+                id="movie-search"
+                name="movie-search"
                 className="search-input"
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search..."
+                autoComplete="off"
             />
-            {error && <ErrorState message={error} />}
-            {!loading && !error && hasSearched && movies.length === 0 && (
-                <EmptyState message={`Nothing was found upon this request «${debouncedQuery}»`} />
+            {loading && <Loader/>}
+            {error && (
+                <ErrorState
+                    message={error}
+                    onRetry={() => loadMovies(debouncedQuery)}
+                />
             )}
-            {movies.length > 0 && <MovieList movies={movies} />}
+                {!loading && !error && hasSearched && movies.length === 0 && (
+                    <EmptyState message={`Nothing was found upon this request «${debouncedQuery}»`} />
+                )}
+                {movies.length > 0 && <MovieList movies={movies} />}
         </div>
     );
 }

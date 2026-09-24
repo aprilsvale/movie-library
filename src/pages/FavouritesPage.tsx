@@ -1,19 +1,20 @@
-import { useAppSelector } from "../app/hooks"
+import { useSelector } from "react-redux";
+import type { RootState } from "../app/store";
 import { MovieList } from "../components/MovieList";
 import { EmptyState } from "../components/EmptyState"
 
 
 export function FavouritesPage() {
 
-    const Favs = useAppSelector((state) => state.favourites.items);
+    const favs = useSelector((state: RootState) => state.favourites.items);
 
     return (
         <div className="favourites-page">
-            <h1>Favs</h1>
-                {Favs.length === 0 ? (
+            <h1>favs</h1>
+                {favs.length === 0 ? (
                 <EmptyState/>
             ) : (
-                <MovieList movies = {Favs} />
+                <MovieList movies = {favs} />
             )}
         </div>
     );
